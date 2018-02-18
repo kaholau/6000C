@@ -8,8 +8,8 @@ import cost
 class Node:
 	def __init__(self,x,y,links):
 		self.linkCost = links
-		self.state = 0
-		self.totalCost = 0 #the minimum total cost from this node to the seed node.  
+		self.state ='INITIAL' #INITIAL, ACTIVE, EXPANDED 
+		self.totalCost = math.inf #the minimum total cost from this node to the seed node.  
 		self.prevNode = None #points to its predecessor along the minimum cost path from the seed to that node. 
 		self.row = x
 		self.column = y
@@ -22,10 +22,8 @@ def randomMat(min,max,h,w):
 
 
 def create_node(img):
-	height, width  = img.shape
-	#print(img.shape,"vs",larger_img.shape)
-	import cost
-	cost_mat = cost.get_cost_mat(img)
+	height, width, depth  = img.shape
+	cost_mat = cost.get_rgb_cost_mat(img)
 	Node_mat = []
 	for i in range(height):
 		node_mat_row = []
@@ -33,21 +31,26 @@ def create_node(img):
 			node = Node(i,j,cost_mat[i][j])
 			node_mat_row.append(node)
 		cost_mat.append(node_mat_row)
-
+	
 	return Node_mat
 
 
 path = 'ferry.bmp'
-print(dir(cost))
-img = cv2.imread(path,0)
-print(img.shape)
-edges = cv2.Canny(img,100,200)
+img = cv2.imread(path,cv2.IMREAD_COLOR)
+
+
+
+
+#edges = cv2.Canny(img,100,200)
 #aplacian = cv2.Laplacian(img,cv2.CV_64F)
 
-mat = create_node(edges)
+#mat = create_node(img)
 
-print(img.shape)
-
-plt.imshow(edges, cmap = 'gray', interpolation = 'bicubic')
+cv2.imshow('image',img)
+cv2.waitKey()
+cv2.destroyAllWindows()
+'''
+plt.imshow(img)
 plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-plt.show()
+plt.show()'''
+
