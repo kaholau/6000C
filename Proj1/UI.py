@@ -42,6 +42,7 @@
 #############################################################################
 
 
+import sys
 from PyQt5.QtCore import QDir, Qt
 from PyQt5.QtGui import QImage, QPainter, QPalette, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QLabel,
@@ -243,9 +244,15 @@ class ImageViewer(QMainWindow):
         self.statusBar().showMessage("File saved", 2000)
         return True
 
-if __name__ == '__main__':
+def run():
+    app = QApplication(sys.argv)
+    imageViewer = ImageViewer()
+    imageViewer.show()
+    sys.exit(app.exec_())
 
-    import sys
+    return
+
+if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     imageViewer = ImageViewer()

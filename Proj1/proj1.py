@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import math 
 import cost
+import UI
 
 
 class Node:
@@ -44,7 +45,7 @@ img = cv2.imread(path,cv2.IMREAD_COLOR)
 #edges = cv2.Canny(img,100,200)
 #aplacian = cv2.Laplacian(img,cv2.CV_64F)
 
-#mat = create_node(img)
+mat = create_node(img)
 
 cv2.imshow('image',img)
 cv2.waitKey()
