@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
 				imageLabel.setPixmap(QPixmap.fromImage(image))
 
 				self.graphicsView.setWidget(imageLabel)
-				self.graphicsView.initialize()
+				self.graphicsView.initialize(fileName)
 				self.scaleFactor = 1.0
 				self.normalSize()
 			
@@ -139,6 +139,7 @@ class MainWindow(QMainWindow):
 	def normalSize(self):
 		#self.imageLabel.adjustSize()
 		self.scaleFactor = 1.0
+		self.graphicsView.normalSize()
 		return
 			
 	def orignalImg(self):
@@ -172,14 +173,14 @@ class MainWindow(QMainWindow):
 		return
 
 	def scaleImage(self, factor):
-		#self.scaleFactor *= factor
+		self.scaleFactor *= factor
 		#self.imageLabel.resize(self.scaleFactor * self.imageLabel.pixmap().size())
+		self.graphicsView.resize(self.scaleFactor)
+		self.adjustScrollBar(self.graphicsView.horizontalScrollBar(), factor)
+		self.adjustScrollBar(self.graphicsView.verticalScrollBar(), factor)
 
-		#self.adjustScrollBar(self.scrollArea.horizontalScrollBar(), factor)
-		#self.adjustScrollBar(self.scrollArea.verticalScrollBar(), factor)
-
-		#self.zoomInAct.setEnabled(self.scaleFactor < 3.0)
-		#self.zoomOutAct.setEnabled(self.scaleFactor > 0.333)
+		self.zoomInAct.setEnabled(self.scaleFactor < 3.0)
+		self.zoomOutAct.setEnabled(self.scaleFactor > 0.333)
 		return
 
 	def adjustScrollBar(self, scrollBar, factor):

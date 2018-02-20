@@ -24,7 +24,7 @@ class Image(QLabel):
 	def __init__(self,fileName):
 		super(Image, self).__init__()	
 		self.fileName = fileName
-
+		self.min_path=[]
 		return
 
 	def start(self):
@@ -56,8 +56,17 @@ class Image(QLabel):
 		return Node_mat
 
 	def mousePressCallback(self,x,y):
+
 		print('Image Press At',x,y)
-		return
+		self.min_path.append([x,y])
+		#return array of contour point for drawing the line
+		return self.min_path 
 
 	def mouseMoveCallback(self,x,y):
 		print('Move Move To',x,y)
+		min_path=[]
+		return min_path 
+
+	def undo(self):
+
+		return
