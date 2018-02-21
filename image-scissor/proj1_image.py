@@ -43,7 +43,7 @@ class Image(QLabel):
 			for j in range(width):
 				n = node.Node(i,j,cost_mat[i][j])
 				node_mat_row.append(n)
-			cost_mat.append(node_mat_row)
+			Node_mat.append(node_mat_row)
 		
 		return Node_mat
 
@@ -52,13 +52,13 @@ class Image(QLabel):
 
 		print('Image Press At',x,y)
 		self.min_path.append([x,y])
-		min_cost_path.compute_min_cost_path(x,y, self.node_mat)
+		min_cost_path.compute_min_cost_path(x, y, self.node_mat)
 		#return array of contour point for drawing the line
 		return self.min_path 
 
 	def mouseMoveCallback(self,x,y):
 		print('Move Move To',x,y)
-		self.min_path.append([x,y])
+		self.min_path = min_cost_path.get_min_path_from_seed(x, y, self.node_mat)
 		return self.min_path 
 
 	def undo(self):
