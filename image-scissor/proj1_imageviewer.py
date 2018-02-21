@@ -80,7 +80,7 @@ class ImageViewer(QScrollArea):
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
 				self.mousePressed = True
-				self.min_path = self.widget().mouseMoveCallback(x,y)
+				self.min_path = self.widget().mouseMoveCallback(y,x)
 				self.drawPoint(False,self.min_path)
 				print('mousePressEvent')
 		return 
@@ -89,7 +89,7 @@ class ImageViewer(QScrollArea):
 		if self.mousePressed and self.getiScissorReady() and (self.seedNum>0):
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
-				self.min_path = self.widget().mouseMoveCallback(x,y)
+				self.min_path = self.widget().mouseMoveCallback(y,x)
 				self.drawPoint(False,self.min_path)
 				print('mouseMoveEvent')
 
@@ -100,7 +100,7 @@ class ImageViewer(QScrollArea):
 		if self.getiScissorReady():
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
-				self.min_path = self.widget().mousePressCallback(x,y)
+				self.min_path = self.widget().mousePressCallback(y,x)
 				self.drawPoint(True,self.min_path)
 				self.seedNum += 1
 				#print(event.pos().x(),event.pos().y())
