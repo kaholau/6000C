@@ -15,8 +15,10 @@ def compute_min_cost_path(x, y, node_mat):
     pq = fibonacci_heap_mod.Fibonacci_heap()
     
     print("node matrix dimensions: ")
-    print(len(node_mat))
-    print(len(node_mat[0]))
+    node_mat_dim_x = len(node_mat)
+    node_mat_dim_y = len(node_mat[0])
+    print(node_mat_dim_x)
+    print(node_mat_dim_y)
     
     seed = node_mat[x][y] 
     seed.set_total_cost(0)
@@ -26,7 +28,7 @@ def compute_min_cost_path(x, y, node_mat):
     
     pq.enqueue(seed, seed.get_total_cost())
     
-    while(pq.__len__ != 0):
+    while(pq.__len__() > 0):
         min_node = pq.dequeue_min().get_value()
         #print("min node is:")
         #print(min_node)
@@ -35,6 +37,9 @@ def compute_min_cost_path(x, y, node_mat):
         ncoord = get_neighbour_coordinates(min_node.get_row_index(), min_node.get_column_index())
         
         for i in range(0, len(ncoord)):
+            
+            if (ncoord[i][0] >= node_mat_dim_x) or (ncoord[i][1] >= node_mat_dim_y):
+                continue
             #print("index")
             #print(str(ncoord[i][0]))
             #print(str(ncoord[i][1]))

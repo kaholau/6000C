@@ -34,7 +34,7 @@ class Node:
     def set_total_cost(self, value):
         self.total_cost = value
         return
-    def get_prev_node(self, value):
+    def get_prev_node(self):
         return self.prev_node
     def set_prev_node(self, value):
         self.prev_node = value
