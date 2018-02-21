@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
 				imageLabel.setPixmap(QPixmap.fromImage(image))
 
 				self.graphicsView.setWidget(imageLabel)
-				self.graphicsView.initialize(fileName)
+				self.graphicsView.initForImage(fileName)
 				self.scaleFactor = 1.0
 				self.normalSize()
 			
@@ -153,7 +153,6 @@ class MainWindow(QMainWindow):
 
 	def iScissorStart(self):
 		print('iScissorStart')
-		self.graphicsView.widget().start()
 		self.graphicsView.setMouseTracking(True)
 		self.graphicsView.setiScissorStarted(True)
 		return
@@ -173,9 +172,9 @@ class MainWindow(QMainWindow):
 		return
 
 	def scaleImage(self, factor):
+		
 		self.scaleFactor *= factor
-		#self.imageLabel.resize(self.scaleFactor * self.imageLabel.pixmap().size())
-		self.graphicsView.resize(self.scaleFactor)
+		self.graphicsView.resize(self.scaleFactor )
 		self.adjustScrollBar(self.graphicsView.horizontalScrollBar(), factor)
 		self.adjustScrollBar(self.graphicsView.verticalScrollBar(), factor)
 
