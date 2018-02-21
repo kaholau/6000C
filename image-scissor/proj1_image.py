@@ -11,6 +11,7 @@ class Image(QLabel):
 		self.fileName = fileName
 		self.min_path = []
 		self.node_mat = []
+		self.iScissorReady = False
 		return
 
 	def start(self):
@@ -25,11 +26,16 @@ class Image(QLabel):
 		#cv2.imshow('image',img)
 		#cv2.waitKey()
 		#cv2.destroyAllWindows()
+
+		self.iScissorReady = True
 		return
+
+	def getiScissorReady(self):
+		return self.iScissorReady
 
 	def create_nodes(self,img):
 		height, width, depth  = img.shape
-		print (height, width, depth)
+		#print ('Dimension: ',height, width, depth)
 		cost_mat = cost.get_rgb_cost_mat(img)
 		Node_mat = []
 		for i in range(height):
@@ -38,8 +44,9 @@ class Image(QLabel):
 				n = node.Node(i,j,cost_mat[i][j])
 				node_mat_row.append(n)
 			cost_mat.append(node_mat_row)
-	
+		
 		return Node_mat
+
 
 	def mousePressCallback(self,x,y):
 
@@ -51,8 +58,8 @@ class Image(QLabel):
 
 	def mouseMoveCallback(self,x,y):
 		print('Move Move To',x,y)
-		min_path=[]
-		return min_path 
+		self.min_path.append([x,y])
+		return self.min_path 
 
 	def undo(self):
 

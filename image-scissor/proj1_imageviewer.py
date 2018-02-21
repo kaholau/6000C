@@ -19,53 +19,107 @@ class ImageViewer(QScrollArea):
 		self.modified = False
 		self.iScissorStarted = False
 		self.mousePressed = False
+		self.qImageHieght = 0
+		self.qImageWidth = 0
+		self.hieghtbound = 0
+		self.widthbound = 0
+		self.imageScaleFactor = 1
+		self.seedNum = 0
+		#self.imageOriginalSize = (0,0)
 		self.min_path=[]
 		return
 
-	def initialize(self,fileName):
+	def initForImage(self,fileName):
 		self.cvImg = cv2.imread(fileName,cv2.IMREAD_COLOR)
 		self.qImage = self.widget().pixmap()
-		self.qImageSize =self.widget().pixmap().size()
+		self.qImageSize = self.widget().pixmap().size()
+		self.qImageHieght = self.widget().pixmap().size().height()
+		self.qImageWidth= self.widget().pixmap().size().width()
+		self.hieghtbound = self.qImageHieght
+		self.widthbound = self.qImageWidth
+		self.imageScaleFactor = 1
+		#self.imageOriginalSize = (,)   
 		self.paintBoard = self.cvImg.copy()
-		print(self.qImageSize)
+		print(self.qImageSize,self.hieghtbound,self.widthbound )
 		return
 
 	def resize(self, factor):
-		self.widget().resize(factor * self.qImage.size())
+		self.imageScaleFactor = factor		
+		self.hieghtbound = self.qImageHieght * factor
+		self.widthbound = self.qImageWidth * factor
+		self.widget().resize(factor  * self.qImage.size())
 		return
 
 	def normalSize(self):
 		self.widget().adjustSize()
 		return
 
-	def setiScissorStarted(self,status):
-		self.iScissorStarted = status
+	def setiScissorStarted(self, isStart):
+		self.iScissorStarted = isStart
+		if isStart : 
+			self.widget().start()
 		return
 
+	def getiScissorReady(self):
+		#print(self.widget().getiScissorReady())
+		return self.widget().getiScissorReady()
+
+	def getOriginalCoordinate(self, event):
+		x = event.pos().x()
+		y = event.pos().y()
+		isGoal = False
+		if  x < self.widthbound and y < self.hieghtbound:
+			isGoal = True
+			x = int(x/self.imageScaleFactor)
+			y = int(y/self.imageScaleFactor)
+			print(x,y)
+		return isGoal,x,y
+
 	def mousePressEvent(self, event):
-		if self.iScissorStarted:
-			self.mousePressed = True
-			self.min_path = self.widget().mousePressCallback(event.pos().x(),event.pos().y())
-			self.drawPoint(event.pos().x(),event.pos().y())
-			#print(event.pos().x(),event.pos().y())
+		if self.getiScissorReady() and (self.seedNum>0):
+			isGoal,x,y = self.getOriginalCoordinate(event)
+			if isGoal:
+				self.mousePressed = True
+				self.min_path = self.widget().mouseMoveCallback(x,y)
+				self.drawPoint(False,self.min_path)
+				print('mousePressEvent')
 		return 
 
 	def mouseMoveEvent(self, event):
-		if self.iScissorStarted and self.mousePressed:
-			self.widget().mouseMoveCallback(event.pos().x(),event.pos().y())
-		return      
-	def mouseReleaseEvent(self, event):
-		if self.iScissorStarted and self.mousePressed:
-			self.mousePressed = False
+		if self.mousePressed and self.getiScissorReady() and (self.seedNum>0):
+			isGoal,x,y = self.getOriginalCoordinate(event)
+			if isGoal:
+				self.min_path = self.widget().mouseMoveCallback(x,y)
+				self.drawPoint(False,self.min_path)
+				print('mouseMoveEvent')
 
-	def drawPoint(self,x,y):
-		mp = self.min_path
+		return      
+
+	def mouseReleaseEvent(self, event):
+		self.mousePressed = False
+		if self.getiScissorReady():
+			isGoal,x,y = self.getOriginalCoordinate(event)
+			if isGoal:
+				self.min_path = self.widget().mousePressCallback(x,y)
+				self.drawPoint(True,self.min_path)
+				self.seedNum += 1
+				#print(event.pos().x(),event.pos().y())
+
+	def drawPoint(self,isConfirm,mp):
+		self.modified = True
+		if isConfirm:
+			#it is confirmed when user release the mouse
+			img = self.paintBoard 
+			isConfirm = False
+		else:
+			img = self.paintBoard.copy()
+
 		if len(mp)>1:
 			for i in range(len(mp)-1):
-				cv2.line(self.paintBoard,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
+				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
 		else:
-			cv2.circle(self.paintBoard,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
-		self.qImage = self.get_qimage(self.paintBoard)
+			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
+		self.qImage = self.get_qimage(img)
 		self.widget().setPixmap(self.qImage)
 		return
 
