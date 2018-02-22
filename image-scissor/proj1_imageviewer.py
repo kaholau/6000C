@@ -100,7 +100,7 @@ class ImageViewer(QScrollArea):
 		if self.getiScissorReady():
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
-				self.min_path = self.widget().mousePressCallback(y,x)
+				self.min_path = self.widget().mouseReleaseCallback(y,x)
 				self.drawPoint(True,self.min_path)
 				self.seedNum += 1
 				#print(event.pos().x(),event.pos().y())
@@ -116,9 +116,9 @@ class ImageViewer(QScrollArea):
 
 		if len(mp)>1:
 			for i in range(len(mp)-1):
-				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
+				cv2.line(img,(mp[i][1],mp[i][0]),(mp[i+1][1],mp[i+1][0]),(255,0,0),2)
 		else:
-			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
+			cv2.circle(img,(mp[0][1],mp[0][0]), 2, (0,0,255), -1)
 		self.qImage = self.get_qimage(img)
 		self.widget().setPixmap(self.qImage)
 		return

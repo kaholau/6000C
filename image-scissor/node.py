@@ -44,5 +44,5 @@ class Node:
     def get_column_index(self):
         return self.column    
     def __repr__(self):
-        return "row:{:s}, column:{:s}, links_cost:{:s}, state:{:s}, total_cost:{:s}, prev_node:{:s}".format(str(self.row), str(self.column), str(self.links_cost), str(self.state), str(self.total_cost), str(self.prev_node)) 
+        return "row:{:s}, column:{:s}, links_cost:{:s}, state:{:s}, total_cost:{:s}".format(str(self.row), str(self.column), str(self.links_cost), str(self.state), str(self.total_cost)) 
     

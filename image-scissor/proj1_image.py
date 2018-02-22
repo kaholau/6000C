@@ -10,6 +10,7 @@ class Image(QLabel):
 		super(Image, self).__init__()	
 		self.fileName = fileName
 		self.min_path = []
+		self.temp_min_path = []
 		self.node_mat = []
 		self.iScissorReady = False
 		return
@@ -48,18 +49,32 @@ class Image(QLabel):
 		return Node_mat
 
 
-	def mousePressCallback(self,x,y):
+	def mouseReleaseCallback(self,x,y):
 
 		print('Image Press At',x,y)
+		self.min_path +=self.temp_min_path
 		self.min_path.append([x,y])
-		min_cost_path.compute_min_cost_path(x, y, self.node_mat)
+		self.temp_min_path = []
+		'''print("Update min_path:")
+		for n in self.min_path:
+			print(n,end=',')'''
+		min_cost_path.compute_min_cost_path(x, y, self.node_mat.copy())
 		#return array of contour point for drawing the line
+
 		return self.min_path 
 
 	def mouseMoveCallback(self,x,y):
-		print('Move Move To',x,y)
-		self.min_path = min_cost_path.get_min_path_from_seed(x, y, self.node_mat)
-		return self.min_path 
+		print('Image Move To',x,y)
+		#node_list contain all points from last seed to [x,y], 
+		node_list = min_cost_path.get_min_path_from_seed(x, y, self.node_mat)
+		#print(len(node_list))
+		self.temp_min_path = []
+		for n in reversed(node_list):
+			self.temp_min_path.append([n.get_row_index(),n.get_column_index()])
+		'''print("Moving min_path:")
+		for n in self.temp_min_path:
+			print(n,end=',')'''
+		return self.min_path+self.temp_min_path
 
 	def undo(self):
 
