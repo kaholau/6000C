@@ -160,6 +160,7 @@ class MainWindow(QMainWindow):
 		print('iScissorDone')
 		self.graphicsView.setMouseTracking(False)
 		self.graphicsView.setiScissorStarted(False)
+		self.graphicsView.getMaskedImage()
 		return
 
 	#========================Menu>About Action Function===================================#

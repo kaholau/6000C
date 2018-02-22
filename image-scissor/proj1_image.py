@@ -16,7 +16,7 @@ class Image(QLabel):
 		return
 
 	def start(self):
-
+		print("waiting for initialization....")
 		img = cv2.imread(self.fileName,cv2.IMREAD_COLOR)
 
 		#edges = cv2.Canny(img,100,200)
@@ -50,30 +50,33 @@ class Image(QLabel):
 
 
 	def mouseReleaseCallback(self,x,y):
-
+		self.iScissorReady = False
 		print('Image Press At',x,y)
 		self.min_path +=self.temp_min_path
-		self.min_path.append([x,y])
+		#index of point drawn on image is the revert of matrix index
+		self.min_path.append([y,x])
 		self.temp_min_path = []
 		'''print("Update min_path:")
 		for n in self.min_path:
 			print(n,end=',')'''
 		min_cost_path.compute_min_cost_path(x, y, self.node_mat.copy())
 		#return array of contour point for drawing the line
-
+		self.iScissorReady = True
 		return self.min_path 
 
 	def mouseMoveCallback(self,x,y):
+		self.iScissorReady = False
 		print('Image Move To',x,y)
 		#node_list contain all points from last seed to [x,y], 
 		node_list = min_cost_path.get_min_path_from_seed(x, y, self.node_mat)
 		#print(len(node_list))
 		self.temp_min_path = []
 		for n in reversed(node_list):
-			self.temp_min_path.append([n.get_row_index(),n.get_column_index()])
+			self.temp_min_path.append([n.get_column_index(),n.get_row_index()])
 		'''print("Moving min_path:")
 		for n in self.temp_min_path:
 			print(n,end=',')'''
+		self.iScissorReady = True
 		return self.min_path+self.temp_min_path
 
 	def undo(self):

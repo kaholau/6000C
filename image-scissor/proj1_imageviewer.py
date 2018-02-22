@@ -116,9 +116,9 @@ class ImageViewer(QScrollArea):
 
 		if len(mp)>1:
 			for i in range(len(mp)-1):
-				cv2.line(img,(mp[i][1],mp[i][0]),(mp[i+1][1],mp[i+1][0]),(255,0,0),2)
+				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
 		else:
-			cv2.circle(img,(mp[0][1],mp[0][0]), 2, (0,0,255), -1)
+			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
 		self.qImage = self.get_qimage(img)
 		self.widget().setPixmap(self.qImage)
 		return
@@ -131,6 +131,32 @@ class ImageViewer(QScrollArea):
 		image = image.rgbSwapped()
 		return QPixmap.fromImage(image)
 
+	def getMaskedImage(self):
+		if True:
+			min_path = np.array(self.min_path)
+			mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
+			cv2.fillConvexPoly(mask,min_path,255)
+			cv2.imshow('mask',mask)
+			src = self.cvImg.copy()
+			dst = cv2.bitwise_and(src,src,mask = mask)
+			#cv2.imshow('dst',dst)
+			mask2 = cv2.bitwise_not(mask)
+			#cv2.imshow('res',mask2)
+			white_background = np.full((self.qImageHieght,self.qImageWidth,3),255,np.uint8)
+			#cv2.imshow('res2',white_background)
+			white_background = cv2.bitwise_and(white_background,white_background,mask = mask2)
+
+			
+			result = dst+white_background
+			self.qImage = self.get_qimage(result)
+			self.widget().setPixmap(self.qImage)
+		return
+		
+	def getImageWithContour(self):
+		src = self.cvImg.copy()
+		for i in range(len(mp)-1):
+				cv2.line(src,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
+		return self.get_qimage(src)
 
 	def isModified(self):
 		return self.modified
