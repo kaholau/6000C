@@ -74,4 +74,16 @@ def get_min_path_from_seed(x, y, node_mat):
         
     return path_mat
         
+def reset_node_matrix(node_mat):
+
+    node_mat_dim_x = len(node_mat)
+    node_mat_dim_y = len(node_mat[0]) 
     
+    for i in range(0, node_mat_dim_x):
+        for j in range(0, node_mat_dim_y):
+            node_mat[i][j].reset()
+            
+            
+            
+            
+            

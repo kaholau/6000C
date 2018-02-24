@@ -59,7 +59,8 @@ class Image(QLabel):
 		'''print("Update min_path:")
 		for n in self.min_path:
 			print(n,end=',')'''
-		min_cost_path.compute_min_cost_path(x, y, self.node_mat.copy())
+		min_cost_path.reset_node_matrix(self.node_mat)
+		min_cost_path.compute_min_cost_path(x, y, self.node_mat)
 		#return array of contour point for drawing the line
 		self.iScissorReady = True
 		return self.min_path 
