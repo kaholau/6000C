@@ -18,7 +18,7 @@ class Node:
         self.row = x
         self.column = y
         self.links_cost = links
-        self.state = 0
+        self.state = INITIAL
         self.total_cost = math.inf #the minimum total cost from this node to the seed node.  
         self.prev_node = None #points to its predecessor along the minimum cost path from the seed to that node. 
         return
@@ -42,7 +42,12 @@ class Node:
     def get_row_index(self):
         return self.row
     def get_column_index(self):
-        return self.column    
+        return self.column
+    def reset(self):
+        self.state = INITIAL
+        self.total_cost = math.inf  
+        self.prev_node = None
+        return
     def __repr__(self):
         return "row:{:s}, column:{:s}, links_cost:{:s}, state:{:s}, total_cost:{:s}".format(str(self.row), str(self.column), str(self.links_cost), str(self.state), str(self.total_cost)) 
     
