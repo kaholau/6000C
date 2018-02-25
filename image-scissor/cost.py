@@ -85,6 +85,10 @@ def get_cost_mat(img):
 
 def get_rgb_cost_mat(img):
 	height, width, depth  = img.shape
+ 
+	#blur = cv2.GaussianBlur(img,(5,5),0)
+	#blur = cv2.blur(img,(5,5))
+	blur = cv2.medianBlur(img,5)
 
 	b,g,r = cv2.split(img)
 	'''print(img[0,0])
