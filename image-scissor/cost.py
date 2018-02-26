@@ -116,4 +116,4 @@ def get_rgb_cost_mat(img):
 	'''for i in range(height):
 		for j in range(width):
 			print(cost_mat[i][j])'''
-	return cost_mat
+	return Max_D_link,cost_mat

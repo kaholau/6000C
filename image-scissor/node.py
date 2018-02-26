@@ -14,14 +14,17 @@ ACTIVE = 1
 EXPANDED = 2
 
 class Node:
-    def __init__(self,x,y,links):
+    def __init__(self,x,y,pixel,links):
         self.row = x
         self.column = y
+        self.pixel = pixel
         self.links_cost = links
         self.state = INITIAL
         self.total_cost = math.inf #the minimum total cost from this node to the seed node.  
         self.prev_node = None #points to its predecessor along the minimum cost path from the seed to that node. 
         return
+    def get_pixel(self):
+        return self.pixel
     def get_links_cost(self):
         return self.links_cost
     def get_state(self):
