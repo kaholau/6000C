@@ -77,6 +77,7 @@ class Image(QLabel):
 		#return min_path from last seed to the first seed
 		if self.first_seed_coord == None:
 		   return
+		print('closed contour')
 		return self.get_min_path_coordinates(self.first_seed_coord[0],self.first_seed_coord[1])
 
 	def get_min_path_coordinates(self,x,y):
