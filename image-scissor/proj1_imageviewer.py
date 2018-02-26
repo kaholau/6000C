@@ -103,7 +103,7 @@ class ImageViewer(QScrollArea):
 				self.min_path = self.widget().mouseReleaseCallback(y,x)
 				self.drawPoint(True,self.min_path)
 				self.seedNum += 1
-				#self.getPathTreeGraph()
+				self.getPathTreeGraph(x,y)
 				#print(event.pos().x(),event.pos().y())
 
 	def drawPoint(self,isConfirm,mp):
@@ -161,19 +161,29 @@ class ImageViewer(QScrollArea):
 				cv2.line(src,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
 		return self.get_qimage(src)
 
-	def getPathTreeGraph(self):
+	def getPathTreeGraph(self,x,y):
+		print('Path Tree:')
 		m = 3
 		graph = np.zeros((self.qImageHieght*m,self.qImageWidth*m,3),np.uint8)
-
+		cv2.circle(graph,(int(x*m),int(y*m)), 2, (0,0,255), -1)
+		win_name = 'Path Tree'
+		cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
+		cv2.imshow(win_name,graph)
+		print(self.qImageHieght*m,self.qImageWidth*m)
 		for i in range(self.qImageHieght):
 			for j in range(self.qImageWidth):
-				mp = np.array(self.widget().get_min_path_coordinates(j,i))
+				mp = np.array(self.widget().get_min_path_coordinates(i,j))
+				#print(mp)
 				mp *= m
-				for k in range(mp.size-1):
-					cv2.line(graph,(mp[k][0],mp[k][1]),(mp[k+1][0],mp[k+1][1]),(255,0,0),1)
-				
+				#print(mp)
+				#print('mp len: ',mp.size)
+				for k in range(int(mp.size/2)-1):
+					#print('k:',k)
+					cv2.line(graph,(mp[k,0],mp[k,1]),(mp[k+1,0],mp[k+1,1]),(255,0,0),1)
 
-		cv2.imshow('Cost Graph',graph)
+				cv2.imshow(win_name,graph)
+				#cv2.waitKey()
+		cv2.imshow(win_name,graph)
 		return
 
 	def isModified(self):
