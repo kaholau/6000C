@@ -15,10 +15,6 @@ class MainWindow(QMainWindow):
 		self.root = QFileInfo(__file__).absolutePath()
 		self.curFile = ''
 
-		'''self.imageLabel = Image()#QLabel()
-		self.imageLabel.setBackgroundRole(QPalette.Base)
-		self.imageLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
-		self.imageLabel.setScaledContents(True)'''
 
 		self.graphicsView = proj1_imageviewer.ImageViewer()#QScrollArea()
 		self.graphicsView.setMouseTracking(False)
@@ -38,6 +34,17 @@ class MainWindow(QMainWindow):
 		self.createToolBars()
 		self.createStatusBar()
 
+		self.iScissorStartAct.setEnabled(False)
+		self.iScissorDoneAct.setEnabled(False)
+		self.undoAct.setEnabled(False)
+		self.normalSizeAct.setEnabled(False)
+		self.zoomInAct.setEnabled(False)
+		self.zoomOutAct.setEnabled(False)	
+		self.orignalImgAct.setEnabled(False)
+		self.maskedImgAct.setEnabled(False)						
+		self.imgWithContourAct.setEnabled(False)
+		self.costGraphAct.setEnabled(False)		
+		self.pathTreeAct.setEnabled(False)				
 		return
 
 	def eventFilter(self, obj, event):
@@ -50,27 +57,33 @@ class MainWindow(QMainWindow):
 		return
 	#===========================Menu>File Action Funtion===================================#
 	def open(self):
-		if self.maybeSave():
-			fileName, _ = QFileDialog.getOpenFileName(self, "Open Image",
-					QDir.currentPath())
-			if fileName:
-				image = QImage(fileName)
-				if image.isNull():
-					QMessageBox.information(self, "iScissor",
-							"Cannot load %s." % fileName)
-					return
+		#if self.maybeSave():
+		fileName, _ = QFileDialog.getOpenFileName(self, "Open Image",
+				QDir.currentPath())
+		if fileName:
+			image = QImage(fileName)
+			if image.isNull():
+				QMessageBox.information(self, "iScissor",
+						"Cannot load %s." % fileName)
+				return
+			self.setCurrentFile(fileName)
+			imageLabel = proj1_image.Image(fileName)#QLabel()
+			imageLabel.setBackgroundRole(QPalette.Base)
+			imageLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+			imageLabel.setScaledContents(True)
+			imageLabel.setPixmap(QPixmap.fromImage(image))
 
-				imageLabel = proj1_image.Image(fileName)#QLabel()
-				imageLabel.setBackgroundRole(QPalette.Base)
-				imageLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
-				imageLabel.setScaledContents(True)
-				imageLabel.setPixmap(QPixmap.fromImage(image))
+			self.graphicsView.setWidget(imageLabel)
+			self.graphicsView.initForImage(fileName)
+			self.scaleFactor = 1.0
+			self.normalSize()
+			self.iScissorStartAct.setEnabled(True)
+			self.undoAct.setEnabled(True)
+			self.normalSizeAct.setEnabled(True)
+			self.zoomInAct.setEnabled(True)
+			self.zoomOutAct.setEnabled(True)
 
-				self.graphicsView.setWidget(imageLabel)
-				self.graphicsView.initForImage(fileName)
-				self.scaleFactor = 1.0
-				self.normalSize()
-			
+			print(self.getCurrentFile())
 		return
 
 	def maybeSave(self):
@@ -87,7 +100,7 @@ class MainWindow(QMainWindow):
 
 		return True
 
-	def save(self):
+	def save(self,case):
 		if not self.getCurrentFile():
 			return
 
@@ -96,7 +109,7 @@ class MainWindow(QMainWindow):
 		fileName, _ = QFileDialog.getSaveFileName(self, "Save As", initialPath,
 				"%s Files (*.%s);;All Files (*)" % (fileFormat.upper(), fileFormat))
 		if fileName:
-			if not self.graphicsView.widget.pixmap().save(fileName):
+			if not self.graphicsView.widget().pixmap().save(fileName):
 				QMessageBox.warning(self, self.tr("Save Image"),self.tr("Failed to save file at the specified location."))
 				return
 			self.statusBar().showMessage("File saved", 2000)
@@ -105,27 +118,16 @@ class MainWindow(QMainWindow):
 
 
 	def exit(self):
-		print('exit')
+		exit()
 		return
 
 	#===========================Menu>Edit Action Function================================#
-	def reset(self):
-		print('reset')
-		self.graphicsView.clear()
-		return
-
 	def undo(self):
-		print('undo')
-		self.graphicsView.undo()
+		if not self.getCurrentFile():
+			return
+		#self.graphicsView.undo()
 		return
 	
-	def copy(self):
-		print('copy')
-		return
-	
-	def paste(self):
-		print('paste')
-		return
 
 	#==========================Menu>View Action Function===========================#
 
@@ -143,10 +145,23 @@ class MainWindow(QMainWindow):
 		return
 			
 	def orignalImg(self):
-		print('orignalImg')
+		self.graphicsView.displayOriginalImg()
 		return
-	def gradientMap(self):
-		print('gradientMap')
+
+	def imgWithContour(self):
+		self.graphicsView.displayImgWithContour()
+		return
+
+	def maskedImg(self):
+		self.graphicsView.displayMaskedImg()
+		return
+
+	def costGraph(self):
+		self.graphicsView.displayCostGraph()
+		return
+
+	def pathTree(self):
+		self.graphicsView.displayPathTreeGraph()
 		return
 	
 	#=========================Menu>Action Action Function================================#
@@ -155,17 +170,31 @@ class MainWindow(QMainWindow):
 		print('iScissorStart')
 		self.graphicsView.setMouseTracking(True)
 		self.graphicsView.setiScissorStarted(True)
+		self.iScissorStartAct.setEnabled(False)
+		self.costGraphAct.setEnabled(True)
+		self.iScissorDoneAct.setEnabled(True)
+		self.pathTreeAct.setEnabled(True)	
 		return
 	def iScissorDone(self):
-		print('iScissorDone')
-		self.graphicsView.setMouseTracking(False)
-		self.graphicsView.setiScissorStarted(False)
-		self.graphicsView.getMaskedImage()
+		if self.graphicsView.setiScissorDone():
+			print('iScissorDone')
+			self.graphicsView.setMouseTracking(False)
+			self.graphicsView.setiScissorStarted(False)
+			self.orignalImgAct.setEnabled(True)
+			self.maskedImgAct.setEnabled(True)						
+			self.imgWithContourAct.setEnabled(True)	
 		return
 
 	#========================Menu>About Action Function===================================#
 	def about(self):
 		print('about')
+		about = '1. Open file to enable iScissor Start button \
+				\n2. Press iScissor Start button and wait few seconds \
+				\n3. Press and release mouse left button to mark the first seed on image \
+				\n4. Press and move without release mouse can preview contour for other seeds \
+				\n5. Press iScissor Done Button to get the masked image'
+
+		QMessageBox.about(self, "About",about)
 		return
 
 	def updateActions(self):
@@ -216,21 +245,9 @@ class MainWindow(QMainWindow):
 
 		#================================Edit================================#
 
-		self.resetAct = QAction(QIcon(self.root + '/icon/reset.png'),"&Reset", self,
-				statusTip="Reset the operation", triggered=self.reset)
-
-
 		self.undoAct = QAction(QIcon(self.root + '/icon/undo.png'),"&Undo", self, shortcut="Ctrl+Z",
 				statusTip="Undo the last operation", triggered=self.undo)
 
-
-		self.copyAct = QAction(QIcon(self.root + '/icon/copy.png'),"&Copy", self, shortcut="Ctrl+C",
-				statusTip="Copy the current selection's contents to the clipboard",
-				triggered=self.copy)
-
-		self.pasteAct = QAction(QIcon(self.root + '/icon/paste.png'),"&Paste", self, shortcut="Ctrl+V",
-				statusTip="Paste the clipboard's contents into the current selection",
-				triggered=self.paste)
 
 		#================================View================================#
 
@@ -246,14 +263,24 @@ class MainWindow(QMainWindow):
 				statusTip="Normal Size",
 				triggered=self.normalSize)
 
-		self.orignalImgAct = QAction("&Orignal Imgage", self,
+		self.orignalImgAct = QAction("&Orignal Image", self,
 				statusTip="Display the orignal Image",
 				triggered=self.orignalImg)
 
+		self.imgWithContourAct = QAction("&Modified Image", self,
+				statusTip="Display the Image with marked Contour",
+				triggered=self.imgWithContour)
 
-		self.gradientMapAct = QAction("&Gradient Map", self,
-				statusTip="Display the Gradient Map",
-				triggered=self.gradientMap)
+		self.maskedImgAct = QAction("&Masked Image", self,
+				statusTip="Display the masked Image",
+				triggered=self.maskedImg)
+
+		self.costGraphAct = QAction("&Cost Graph Image", self,
+				statusTip="Display the Cost Graph Image",
+				triggered=self.costGraph)		
+		self.pathTreeAct = QAction("&Path Tree Image", self,
+				statusTip="Display the Path Tree Image",
+				triggered=self.pathTree)				
 
 		#================================Action================================#
 
@@ -278,19 +305,19 @@ class MainWindow(QMainWindow):
 		self.fileMenu.addAction(self.exitAct)
 
 		self.editMenu = self.menuBar().addMenu("&Edit")
-		self.editMenu.addAction(self.resetAct)
 		self.editMenu.addAction(self.undoAct)
-		self.editMenu.addSeparator()
-		self.editMenu.addAction(self.copyAct)
-		self.editMenu.addAction(self.pasteAct)
 
 		self.editMenu = self.menuBar().addMenu("&View")
 		self.editMenu.addAction(self.normalSizeAct)
 		self.editMenu.addAction(self.zoomInAct)
 		self.editMenu.addAction(self.zoomOutAct)
 		self.editMenu.addSeparator()
+		self.editMenu.addAction(self.costGraphAct)
+		self.editMenu.addAction(self.pathTreeAct)
 		self.editMenu.addAction(self.orignalImgAct)
-		self.editMenu.addAction(self.gradientMapAct)
+		self.editMenu.addAction(self.imgWithContourAct)
+		self.editMenu.addAction(self.maskedImgAct)
+
 
 		self.editMenu = self.menuBar().addMenu("&Action")
 		self.editMenu.addAction(self.iScissorStartAct)
@@ -306,11 +333,7 @@ class MainWindow(QMainWindow):
 		self.fileToolBar.addAction(self.saveAct)
 
 		self.editToolBar = self.addToolBar("Edit")
-		self.editToolBar.addAction(self.resetAct)
 		self.editToolBar.addAction(self.undoAct)
-		self.editToolBar.addAction(self.copyAct)
-		self.editToolBar.addAction(self.pasteAct)
-
 
 		self.editToolBar = self.addToolBar("View")
 		self.editToolBar.addAction(self.normalSizeAct)

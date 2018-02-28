@@ -25,8 +25,11 @@ class ImageViewer(QScrollArea):
 		self.widthbound = 0
 		self.imageScaleFactor = 1
 		self.seedNum = 0
+		self.qImage = None
+		self.costGraph =None
 		#self.imageOriginalSize = (0,0)
 		self.min_path=[]
+		self.cur_seed = None
 		return
 
 	def initForImage(self,fileName):
@@ -43,6 +46,29 @@ class ImageViewer(QScrollArea):
 		print(self.qImageSize,self.hieghtbound,self.widthbound )
 		return
 
+	def displayOriginalImg(self):
+		self.qImage = self.get_qimage(self.cvImg)
+		self.widget().setPixmap(self.qImage)		
+
+		return
+	def displayImgWithContour(self):
+		self.drawPoint(self.cvImg,self.min_path)
+		return
+
+
+	def displayMaskedImg(self):
+		self.getMaskedImage()
+		return
+
+	def displayCostGraph(self):
+		cv2.imshow('Cost Graph',self.costGraph)
+		return
+	
+	def displayPathTreeGraph(self):
+		if self.seedNum>0:
+			self.getPathTreeGraph()
+		return
+
 	def resize(self, factor):
 		self.imageScaleFactor = factor		
 		self.hieghtbound = self.qImageHieght * factor
@@ -57,10 +83,17 @@ class ImageViewer(QScrollArea):
 	def setiScissorStarted(self, isStart):
 		self.iScissorStarted = isStart
 		if isStart : 
-			self.widget().start()
+			self.costGraph = self.widget().start()
 		return
-
+	def setiScissorDone(self):
+		print(len(self.min_path) )
+		if len(self.min_path) >2:
+			self.getMaskedImage()
+			return True
+		return False
 	def getiScissorReady(self):
+		if not self.qImage:
+			return
 		#print(self.widget().getiScissorReady())
 		return self.widget().getiScissorReady()
 
@@ -81,7 +114,7 @@ class ImageViewer(QScrollArea):
 			if isGoal:
 				self.mousePressed = True
 				self.min_path = self.widget().mouseMoveCallback(y,x)
-				self.drawPoint(False,self.min_path)
+				self.drawPath(False,self.min_path)
 				print('mousePressEvent')
 		return 
 
@@ -90,7 +123,7 @@ class ImageViewer(QScrollArea):
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
 				self.min_path = self.widget().mouseMoveCallback(y,x)
-				self.drawPoint(False,self.min_path)
+				self.drawPath(False,self.min_path)
 				print('mouseMoveEvent')
 
 		return      
@@ -101,20 +134,13 @@ class ImageViewer(QScrollArea):
 			isGoal,x,y = self.getOriginalCoordinate(event)
 			if isGoal:
 				self.min_path = self.widget().mouseReleaseCallback(y,x)
-				self.drawPoint(True,self.min_path)
+				self.cur_seed = [x,y]
+				self.drawPath(True,self.min_path)
 				self.seedNum += 1
-				self.getPathTreeGraph(x,y)
+				#self.getPathTreeGraph(x,y)
 				#print(event.pos().x(),event.pos().y())
 
-	def drawPoint(self,isConfirm,mp):
-		self.modified = True
-		if isConfirm:
-			#it is confirmed when user release the mouse
-			img = self.paintBoard 
-			isConfirm = False
-		else:
-			img = self.paintBoard.copy()
-
+	def drawPoint(self,img,mp):
 		if len(mp)>1:
 			for i in range(len(mp)-1):
 				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),1)
@@ -122,6 +148,17 @@ class ImageViewer(QScrollArea):
 			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
 		self.qImage = self.get_qimage(img)
 		self.widget().setPixmap(self.qImage)
+		return
+
+	def drawPath(self,isConfirm,mp):
+		self.modified = True
+		if isConfirm:
+			#it is confirmed when user release the mouse
+			img = self.paintBoard 
+			isConfirm = False
+		else:
+			img = self.paintBoard.copy()
+		self.drawPoint(img,mp)
 		return
 
 	def get_qimage(self, image: np.ndarray):
@@ -133,39 +170,33 @@ class ImageViewer(QScrollArea):
 		return QPixmap.fromImage(image)
 
 	def getMaskedImage(self):
-		if True:
-			min_path = np.array(self.widget().getClosedCoutour())
-			mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
-			#cv2.drawContours(mask,min_path,0,-1)
-			cv2.fillConvexPoly(mask,min_path,255)
+		min_path = np.array(self.widget().getClosedCoutour())
+		mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
+		#cv2.drawContours(mask,min_path,0,-1)
+		cv2.fillConvexPoly(mask,min_path,255)
 
-			cv2.imshow('mask',mask)
-			src = self.cvImg.copy()
-			dst = cv2.bitwise_and(src,src,mask = mask)
-			#cv2.imshow('dst',dst)
-			mask2 = cv2.bitwise_not(mask)
-			#cv2.imshow('res',mask2)
-			white_background = np.full((self.qImageHieght,self.qImageWidth,3),255,np.uint8)
-			#cv2.imshow('res2',white_background)
-			white_background = cv2.bitwise_and(white_background,white_background,mask = mask2)
+		#cv2.imshow('mask',mask)
+		src = self.cvImg.copy()
+		dst = cv2.bitwise_and(src,src,mask = mask)
+		#cv2.imshow('dst',dst)
+		mask2 = cv2.bitwise_not(mask)
+		#cv2.imshow('res',mask2)
+		white_background = np.full((self.qImageHieght,self.qImageWidth,3),255,np.uint8)
+		#cv2.imshow('res2',white_background)
+		white_background = cv2.bitwise_and(white_background,white_background,mask = mask2)
 
-			
-			result = dst+white_background
-			self.qImage = self.get_qimage(result)
-			self.widget().setPixmap(self.qImage)
+		
+		result = dst+white_background
+		self.qImage = self.get_qimage(result)
+		self.widget().setPixmap(self.qImage)
 		return
 		
-	def getImageWithContour(self):
-		src = self.cvImg.copy()
-		for i in range(len(mp)-1):
-				cv2.line(src,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
-		return self.get_qimage(src)
 
-	def getPathTreeGraph(self,x,y):
+	def getPathTreeGraph(self):
 		print('Path Tree:')
 		m = 3
 		graph = np.zeros((self.qImageHieght*m,self.qImageWidth*m,3),np.uint8)
-		cv2.circle(graph,(int(x*m),int(y*m)), 2, (0,0,255), -1)
+		cv2.circle(graph,(int(self.cur_seed[0]*m),int(self.cur_seed[1]*m)), 2, (0,0,255), -1)
 		win_name = 'Path Tree'
 		cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
 		cv2.imshow(win_name,graph)
@@ -186,5 +217,11 @@ class ImageViewer(QScrollArea):
 		cv2.imshow(win_name,graph)
 		return
 
+	def undo(self):
+		if len(self.min_path) > 0:
+			self.min_path = self.widget().undo()
+			self.drawPath(True,self.min_path)
+			self.paintBoard = self.cvImg.copy()
+		return
 	def isModified(self):
 		return self.modified
