@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
 	def undo(self):
 		if not self.getCurrentFile():
 			return
-		#self.graphicsView.undo()
+		self.graphicsView.undo()
 		return
 	
 

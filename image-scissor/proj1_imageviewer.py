@@ -105,7 +105,7 @@ class ImageViewer(QScrollArea):
 			isGoal = True
 			x = int(x/self.imageScaleFactor)
 			y = int(y/self.imageScaleFactor)
-			print(x,y)
+
 		return isGoal,x,y
 
 	def mousePressEvent(self, event):
@@ -115,7 +115,6 @@ class ImageViewer(QScrollArea):
 				self.mousePressed = True
 				self.min_path = self.widget().mouseMoveCallback(y,x)
 				self.drawPath(False,self.min_path)
-				print('mousePressEvent')
 		return 
 
 	def mouseMoveEvent(self, event):
@@ -124,7 +123,6 @@ class ImageViewer(QScrollArea):
 			if isGoal:
 				self.min_path = self.widget().mouseMoveCallback(y,x)
 				self.drawPath(False,self.min_path)
-				print('mouseMoveEvent')
 
 		return      
 
@@ -137,14 +135,14 @@ class ImageViewer(QScrollArea):
 				self.cur_seed = [x,y]
 				self.drawPath(True,self.min_path)
 				self.seedNum += 1
-				#self.getPathTreeGraph(x,y)
-				#print(event.pos().x(),event.pos().y())
+		return  
 
 	def drawPoint(self,img,mp):
+		#print('drawPoint: ', mp)
 		if len(mp)>1:
 			for i in range(len(mp)-1):
 				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),1)
-		else:
+		elif len(mp) == 1:
 			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
 		self.qImage = self.get_qimage(img)
 		self.widget().setPixmap(self.qImage)
@@ -220,8 +218,8 @@ class ImageViewer(QScrollArea):
 	def undo(self):
 		if len(self.min_path) > 0:
 			self.min_path = self.widget().undo()
-			self.drawPath(True,self.min_path)
 			self.paintBoard = self.cvImg.copy()
+			self.drawPath(True,self.min_path)
 		return
 	def isModified(self):
 		return self.modified

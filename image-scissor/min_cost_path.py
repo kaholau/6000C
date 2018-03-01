@@ -18,11 +18,11 @@ def compute_min_cost_path(x, y, node_mat):
     #heap = []
     q = Q.PriorityQueue()
     
-    print("node matrix dimensions: ")
+    #print("node matrix dimensions: ")
     node_mat_dim_x = len(node_mat)
     node_mat_dim_y = len(node_mat[0])
-    print(node_mat_dim_x)
-    print(node_mat_dim_y)
+    #print(node_mat_dim_x)
+    #print(node_mat_dim_y)
     
     seed = node_mat[x][y] 
     seed.set_total_cost(0)
