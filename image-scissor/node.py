@@ -51,6 +51,10 @@ class Node:
         self.total_cost = math.inf  
         self.prev_node = None
         return
+    def __cmp__(self, other):
+        return cmp(self.total_cost, other.total_cost)
+    def __lt__(self, other):
+        return self.total_cost < other.total_cost
     def __repr__(self):
         return "row:{:s}, column:{:s}, links_cost:{:s}, state:{:s}, total_cost:{:s}".format(str(self.row), str(self.column), str(self.links_cost), str(self.state), str(self.total_cost)) 
     
