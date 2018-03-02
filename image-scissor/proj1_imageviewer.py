@@ -143,7 +143,7 @@ class ImageViewer(QScrollArea):
 		#print('drawPoint: ', mp)
 		if len(mp)>1:
 			for i in range(len(mp)-1):
-				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),1)
+				cv2.line(img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),(255,0,0),2)
 		elif len(mp) == 1:
 			cv2.circle(img,(mp[0][0],mp[0][1]), 2, (0,0,255), -1)
 		self.qImage = self.get_qimage(img)
