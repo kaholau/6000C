@@ -170,10 +170,17 @@ class ImageViewer(QScrollArea):
 	def getMaskedImage(self):
 		min_path = np.array(self.widget().getClosedCoutour())
 		mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
-		#cv2.drawContours(mask,min_path,0,-1)
+		'''mp = min_path
+		for i in range(len(mp)-1):
+				cv2.line(mask,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),255,1)
+		im2, contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
+		cv2.drawContours(mask, contours, -1, 255, cv2.FILLED)
+		'''
 		cv2.fillConvexPoly(mask,min_path,255)
 
 		#cv2.imshow('mask',mask)
+		#cv2.waitKey()
 		src = self.cvImg.copy()
 		dst = cv2.bitwise_and(src,src,mask = mask)
 		#cv2.imshow('dst',dst)

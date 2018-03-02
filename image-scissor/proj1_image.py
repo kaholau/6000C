@@ -26,9 +26,6 @@ class Image(QLabel):
 		print("waiting for initialization....")
 		img = cv2.imread(self.fileName,cv2.IMREAD_COLOR)
 
-		#edges = cv2.Canny(img,100,200)
-		#aplacian = cv2.Laplacian(img,cv2.CV_64F)
-
 		self.node_mat = self.create_nodes(img)
 		print('nodes created')
 		graph = self.getCostGraph()
@@ -49,7 +46,11 @@ class Image(QLabel):
 		self.width = width
 		self.depth = depth
 		#print ('Dimension: ',height, width, depth)
+		#edges = cv2.Canny(img,100,200)
+		#aplacian = cv2.Laplacian(img,cv2.CV_64F)
+
 		self.maxCost, cost_mat = cost.get_rgb_cost_mat(img)
+		#self.maxCost, cost_mat = cost.get_cost_mat(img)
 		Node_mat = []
 		for i in range(height):
 			node_mat_row = []

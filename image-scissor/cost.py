@@ -4,23 +4,23 @@ from matplotlib import pyplot as plt
 import math
 
 ##	This function calculate the cost to 8 neighbors
-#@	link is the 8 neighours pixel value
+#@	pixels is the 8 neighours pixel value
 Max_D_link = 0
-def D_link(link):
+def D_link(pixels):
 	global Max_D_link
 	#print(link)
 	d_link = [0]*8
-	for i in range(len(link)):
+	for i in range(len(pixels)):
 		if i%2==0:	#even index
 			if i == 6:
-				d_link[i] = abs((link[i-1]+link[i-2])/2-(link[i+1]+link[0])/2)/2	
+				d_link[i] = abs((pixels[i-1]+pixels[i-2])/2-(pixels[i+1]+pixels[0])/2)/2	
 			else:
-				d_link[i] = abs((link[i-1]+link[i-2])/2-(link[i+1]+link[i+2])/2)/2
+				d_link[i] = abs((pixels[i-1]+pixels[i-2])/2-(pixels[i+1]+pixels[i+2])/2)/2
 		else:
 			if i == 7 :
-				d_link[i] = abs(link[i-1]+link[0])/math.sqrt(2)
+				d_link[i] = abs(pixels[i-1]+pixels[0])/math.sqrt(2)
 			else:
-				d_link[i] = abs(link[i-1]+link[i+1])/math.sqrt(2)
+				d_link[i] = abs(pixels[i-1]+pixels[i+1])/math.sqrt(2)
 	#print(d_link)
 	Max_D_link = max(d_link) if max(d_link)>Max_D_link else Max_D_link
 
@@ -46,34 +46,29 @@ def get_cost_mat(img):
 	##	Adding boarder to the image for the convinient of link calculation
 	##	shape of img will be increae to (width+2,height+2), 0 is black, 255 is white
 	larger_img= cv2.copyMakeBorder(img,1,1,1,1,cv2.BORDER_CONSTANT,value=128)
-	height, width  =larger_img.shape
+	if len(larger_img.shape) > 2:
+		height, width, depth  =larger_img.shape
+	else:
+		height, width  =larger_img.shape
 	#print(img.shape,"vs",larger_img.shape)
 	cost_mat = []
-	links = [0]*8
+	pixels = [0]*8
 	#if shape is 10*8, range() return (0..9)*(0..7)
 	#if larger_img has shape 10*8, then just (1..8)*(1..6) are needed 
-	'''for i in range(0,3):
-		for j in range(0,10):
-			print(img[i][j])'''
-
 	for i in range(1,height-1):
 		cost_mat_row = []
 		for j in range(1,width-1):
-			#print('(',i,',',j,')',end='')
-			links[0] = int(larger_img[i+1,j])
-			links[1] = int(larger_img[i+1,j-1])
-			links[2] = int(larger_img[i,j-1])
-			links[3] = int(larger_img[i-1,j-1])
-			links[4] = int(larger_img[i-1,j])
-			links[5] = int(larger_img[i-1,j+1])
-			links[6] = int(larger_img[i,j+1])
-			links[7] = int(larger_img[i+1,j+1])
-			cost_mat_row.append(D_link(links))
+			pixels[0] = int(larger_img[i+1,j])
+			pixels[1] = int(larger_img[i+1,j-1])
+			pixels[2] = int(larger_img[i,j-1])
+			pixels[3] = int(larger_img[i-1,j-1])
+			pixels[4] = int(larger_img[i-1,j])
+			pixels[5] = int(larger_img[i-1,j+1])
+			pixels[6] = int(larger_img[i,j+1])
+			pixels[7] = int(larger_img[i+1,j+1])
+			cost_mat_row.append(D_link(pixels))
 
 		cost_mat.append(cost_mat_row)
-	'''for i in range(100,105):
-		for j in range(100,105):
-			print(cost_mat[i][j])'''
 
 	#print("Max_D_link: ",Max_D_link)
 	for i in range(height-2):
