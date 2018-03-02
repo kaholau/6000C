@@ -61,6 +61,8 @@ class ImageViewer(QScrollArea):
 		return
 
 	def displayCostGraph(self):
+		cv2.namedWindow('Cost Graph',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('Cost Graph', 640,480)
 		cv2.imshow('Cost Graph',self.costGraph)
 		return
 	
@@ -217,7 +219,7 @@ class ImageViewer(QScrollArea):
 					#print('k:',k)
 					cv2.line(graph,(mp[k,0],mp[k,1]),(mp[k+1,0],mp[k+1,1]),(255,0,0),1)
 
-				cv2.imshow(win_name,graph)
+				#cv2.imshow(win_name,graph)
 				#cv2.waitKey()
 		cv2.imshow(win_name,graph)
 		return

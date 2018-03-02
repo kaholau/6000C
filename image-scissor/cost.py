@@ -31,52 +31,54 @@ def D_link(pixels):
 def link_cost(d_links):
 	#print(d_links)
 	for i,d in enumerate(d_links):
+		#print(i,d)
 		if i%2==0:
-			d = (Max_D_link-d)*1
+			d_links[i] = (Max_D_link-d)*1
 		else:
-			d = (Max_D_link-d)*math.sqrt(2)
+			d_links[i] = (Max_D_link-d)*math.sqrt(2)
+		#print(i,d)
 	#print(d_links,"\n")
-	
+	#input("Press Enter to continue...")
 	return d_links
 
 
-def get_cost_mat(img):
+def get_dlink_mat(img):
 	global Max_D_link
 	Max_D_link = 0
 	##	Adding boarder to the image for the convinient of link calculation
 	##	shape of img will be increae to (width+2,height+2), 0 is black, 255 is white
-	larger_img= cv2.copyMakeBorder(img,1,1,1,1,cv2.BORDER_CONSTANT,value=128)
-	if len(larger_img.shape) > 2:
-		height, width, depth  =larger_img.shape
+	bordered_img= cv2.copyMakeBorder(img,1,1,1,1,cv2.BORDER_CONSTANT,value=128)
+	if len(bordered_img.shape) > 2:
+		height, width, depth  =bordered_img.shape
 	else:
-		height, width  =larger_img.shape
-	#print(img.shape,"vs",larger_img.shape)
-	cost_mat = []
+		height, width  =bordered_img.shape
+	#print(img.shape,"vs",bordered_img.shape)
+	dlink_mat = []
 	pixels = [0]*8
 	#if shape is 10*8, range() return (0..9)*(0..7)
-	#if larger_img has shape 10*8, then just (1..8)*(1..6) are needed 
+	#if bordered_img has shape 10*8, then just (1..8)*(1..6) are needed 
 	for i in range(1,height-1):
-		cost_mat_row = []
+		dlink_mat_row = []
 		for j in range(1,width-1):
-			pixels[0] = int(larger_img[i+1,j])
-			pixels[1] = int(larger_img[i+1,j-1])
-			pixels[2] = int(larger_img[i,j-1])
-			pixels[3] = int(larger_img[i-1,j-1])
-			pixels[4] = int(larger_img[i-1,j])
-			pixels[5] = int(larger_img[i-1,j+1])
-			pixels[6] = int(larger_img[i,j+1])
-			pixels[7] = int(larger_img[i+1,j+1])
-			cost_mat_row.append(D_link(pixels))
+			pixels[0] = int(bordered_img[i+1,j])
+			pixels[1] = int(bordered_img[i+1,j-1])
+			pixels[2] = int(bordered_img[i,j-1])
+			pixels[3] = int(bordered_img[i-1,j-1])
+			pixels[4] = int(bordered_img[i-1,j])
+			pixels[5] = int(bordered_img[i-1,j+1])
+			pixels[6] = int(bordered_img[i,j+1])
+			pixels[7] = int(bordered_img[i+1,j+1])
+			dlink_mat_row.append(D_link(pixels))
 
-		cost_mat.append(cost_mat_row)
+		dlink_mat.append(dlink_mat_row)
 
-	#print("Max_D_link: ",Max_D_link)
-	for i in range(height-2):
+	print("Max_D_link: ",Max_D_link)
+	'''for i in range(height-2):
 		for j in range(width-2):
-			cost_mat[i][j] = link_cost(cost_mat[i][j])
-			#print(cost_mat[i][j],end='')
+			dlink_mat[i][j] = link_cost(dlink_mat[i][j])
+			#print(dlink_mat[i][j],end='')'''
 
-	return Max_D_link, cost_mat
+	return Max_D_link, dlink_mat
 
 def get_rgb_cost_mat(img):
 	height, width, depth  = img.shape
@@ -94,17 +96,17 @@ def get_rgb_cost_mat(img):
 	plt.show()
 	exit()
 	'''
-	b_max_D_link, b_cost_mat = get_cost_mat(b)
-	g_max_D_link, g_cost_mat = get_cost_mat(g)
-	r_max_D_link, r_cost_mat = get_cost_mat(r)
+	b_max_D_link, b_dlink_mat = get_dlink_mat(b)
+	g_max_D_link, g_dlink_mat = get_dlink_mat(g)
+	r_max_D_link, r_dlink_mat = get_dlink_mat(r)
 	Max_D_link = max(b_max_D_link,g_max_D_link,r_max_D_link)
 	cost_mat = []
 	for i in range(height): 
 		cost_mat_row = []
 		for j in range(width):
-			DB=np.square( b_cost_mat[i][j])
-			DG=np.square( g_cost_mat[i][j])
-			DR=np.square( r_cost_mat[i][j])
+			DB=np.square( b_dlink_mat[i][j])
+			DG=np.square( g_dlink_mat[i][j])
+			DR=np.square( r_dlink_mat[i][j])
 			D_link = np.sqrt((DB+DG+DR)/3.0)
 			cost_mat_row.append(link_cost(D_link.tolist()))
 		cost_mat.append(cost_mat_row)
