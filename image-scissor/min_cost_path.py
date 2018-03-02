@@ -14,9 +14,9 @@ import queue as Q
 
 def compute_min_cost_path(x, y, node_mat):
     
-    #pq = fibonacci_heap_mod.Fibonacci_heap()
+    pq = fibonacci_heap_mod.Fibonacci_heap()
     #heap = []
-    q = Q.PriorityQueue()
+    #q = Q.PriorityQueue()
     
     #print("node matrix dimensions: ")
     node_mat_dim_x = len(node_mat)
@@ -30,16 +30,16 @@ def compute_min_cost_path(x, y, node_mat):
     print("seed node is:")
     print(seed)
     
-    #pq.enqueue(seed, seed.get_total_cost())
+    pq.enqueue(seed, seed.get_total_cost())
     #heapq.heappush(heap, (seed.get_total_cost(), seed))
-    q.put((seed.get_total_cost(), seed))
+    #q.put((seed.get_total_cost(), seed))
     
-    #while(pq.__len__() > 0):
+    while(pq.__len__() > 0):
     #while(len(heap) > 0):
-    while not q.empty():
-        #min_node = pq.dequeue_min().get_value()
+    #while not q.empty():
+        min_node = pq.dequeue_min().get_value()
         #min_node = heapq.heappop(heap)[1]
-        min_node = q.get()[1]
+        #min_node = q.get()[1]
         
         #print("min node is:")
         #print(min_node)
@@ -63,9 +63,9 @@ def compute_min_cost_path(x, y, node_mat):
                 neighbour.set_prev_node(min_node)
                 neighbour.set_total_cost(min_node.get_total_cost() + min_node.get_links_cost()[i])
                 neighbour.set_state(node.ACTIVE)
-                #pq.enqueue(neighbour, neighbour.get_total_cost())
+                pq.enqueue(neighbour, neighbour.get_total_cost())
                 #heapq.heappush(heap, (neighbour.get_total_cost(), neighbour))
-                q.put((neighbour.get_total_cost(), neighbour))
+                #q.put((neighbour.get_total_cost(), neighbour))
                 
             elif neighbour.state == node.ACTIVE:
                 if (min_node.get_total_cost() + min_node.get_links_cost()[i]) < neighbour.get_total_cost():
