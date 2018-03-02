@@ -18,9 +18,9 @@ def D_link(pixels):
 				d_link[i] = abs((pixels[i-1]+pixels[i-2])/2-(pixels[i+1]+pixels[i+2])/2)/2
 		else:
 			if i == 7 :
-				d_link[i] = abs(pixels[i-1]+pixels[0])/math.sqrt(2)
+				d_link[i] = abs(pixels[i-1]-pixels[0])/math.sqrt(2)
 			else:
-				d_link[i] = abs(pixels[i-1]+pixels[i+1])/math.sqrt(2)
+				d_link[i] = abs(pixels[i-1]-pixels[i+1])/math.sqrt(2)
 	#print(d_link)
 	Max_D_link = max(d_link) if max(d_link)>Max_D_link else Max_D_link
 

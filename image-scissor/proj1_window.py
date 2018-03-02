@@ -204,12 +204,14 @@ class MainWindow(QMainWindow):
 	def scaleImage(self, factor):
 		
 		self.scaleFactor *= factor
+
+		self.zoomInAct.setEnabled(self.scaleFactor < 3.0)
+		self.zoomOutAct.setEnabled(self.scaleFactor > 0.333)
+		
 		self.graphicsView.resize(self.scaleFactor )
 		self.adjustScrollBar(self.graphicsView.horizontalScrollBar(), factor)
 		self.adjustScrollBar(self.graphicsView.verticalScrollBar(), factor)
 
-		self.zoomInAct.setEnabled(self.scaleFactor < 3.0)
-		self.zoomOutAct.setEnabled(self.scaleFactor > 0.333)
 		return
 
 	def adjustScrollBar(self, scrollBar, factor):
