@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QGraphicsView, QGraphicsScene, QAction, QActionGrou
 		QWidget)
 import numpy as np
 import cv2 
-		
+from matplotlib import pyplot as plt
 
 
 
@@ -61,14 +61,23 @@ class ImageViewer(QScrollArea):
 		return
 
 	def displayCostGraph(self):
-		cv2.namedWindow('Cost Graph',cv2.WINDOW_NORMAL)
+		print('Creating Cost Graph, please wait......')
+		'''cv2.namedWindow('Cost Graph',cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('Cost Graph', 640,480)
 		cv2.imshow('Cost Graph',self.costGraph)
+		'''
+		plt.imshow(self.costGraph)
+		plt.suptitle('Cost Graph')
+		plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+		plt.show()
+		print('Cost Graph Done')
 		return
 	
 	def displayPathTreeGraph(self):
 		if self.seedNum>0:
-			self.getPathTreeGraph()
+			print('Creating Path Tree, please wait......')
+			img = self.getPathTreeGraph()
+			print('Path Tree Done')
 		return
 
 	def resize(self, factor):
@@ -200,29 +209,24 @@ class ImageViewer(QScrollArea):
 		
 
 	def getPathTreeGraph(self):
-		print('Path Tree:')
 		m = 3
 		graph = np.zeros((self.qImageHieght*m,self.qImageWidth*m,3),np.uint8)
 		cv2.circle(graph,(int(self.cur_seed[0]*m),int(self.cur_seed[1]*m)), 2, (0,0,255), -1)
-		win_name = 'Path Tree'
-		cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
-		cv2.imshow(win_name,graph)
-		print(self.qImageHieght*m,self.qImageWidth*m)
 		for i in range(self.qImageHieght):
 			for j in range(self.qImageWidth):
 				mp = np.array(self.widget().get_min_path_coordinates(i,j))
-				#print(mp)
 				mp *= m
-				#print(mp)
-				#print('mp len: ',mp.size)
 				for k in range(int(mp.size/2)-1):
-					#print('k:',k)
-					cv2.line(graph,(mp[k,0],mp[k,1]),(mp[k+1,0],mp[k+1,1]),(255,0,0),1)
+					if (graph[mp[k+1,1],mp[k+1,0]].all() == 0):
+						cv2.line(graph,(mp[k,0],mp[k,1]),(mp[k+1,0],mp[k+1,1]),(255,0,0),1)
 
-				#cv2.imshow(win_name,graph)
-				#cv2.waitKey()
-		cv2.imshow(win_name,graph)
-		return
+		plt.imshow(graph)
+		plt.suptitle('Path Tree')
+		plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+		plt.show()
+
+
+		return 
 
 	def undo(self):
 		if len(self.min_path) > 0:
