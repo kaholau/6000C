@@ -57,37 +57,37 @@ output: a minimum path tree in the input graph with each node pointing to its pr
 
 comment: each node will experience three states: INITIAL, ACTIVE, EXPANDED sequentially. the algorithm terminates when all nodes are EXPANDED. All nodes in graph are initialized as INITIAL. When the algorithm runs, all ACTIVE nodes are kept in a priority queue, pq, ordered by the current total cost from the node to the seed. 
 
-Begin:
+    Begin:
 
-  initialize the priority queue pq to be empty;
-  initialize each node to the INITIAL state;
-  set the total cost of seed to be zero and make seed the root of the minimum path tree ( pointing to NULL ) ;
-  insert seed into pq; 
+      initialize the priority queue pq to be empty;
+      initialize each node to the INITIAL state;
+      set the total cost of seed to be zero and make seed the root of the minimum path tree ( pointing to NULL ) ;
+      insert seed into pq; 
 
-  while pq is not empty 
+      while pq is not empty 
 
-    extract the node q with the minimum total cost in pq;
-    mark q as EXPANDED; 
-    
-    for each neighbor node r of q  
+        extract the node q with the minimum total cost in pq;
+        mark q as EXPANDED; 
 
-      if  r has not been EXPANDED
+        for each neighbor node r of q  
 
-        if  r is still INITIAL
+          if  r has not been EXPANDED
 
-          make q be the predecessor of r ( for the the minimum path tree );
+            if  r is still INITIAL
 
-          set the total cost of r to be the sum of the total cost of q and link cost from q to r as its total cost;
+              make q be the predecessor of r ( for the the minimum path tree );
 
-          insert r in pq and mark it as ACTIVE;
+              set the total cost of r to be the sum of the total cost of q and link cost from q to r as its total cost;
 
-        else if  r is ACTIVE, e.g., in already in the pq 
+              insert r in pq and mark it as ACTIVE;
 
-          if the sum of the total cost of q and link cost between q and r is less than the total cost of r
+            else if  r is ACTIVE, e.g., in already in the pq 
 
-            update q to be the predecessor of r ( for the minimum path tree );
+              if the sum of the total cost of q and link cost between q and r is less than the total cost of r
 
-            update the total cost of r in pq;
+                update q to be the predecessor of r ( for the minimum path tree );
 
-End
+                update the total cost of r in pq;
+
+    End
 
