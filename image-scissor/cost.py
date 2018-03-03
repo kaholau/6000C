@@ -87,7 +87,7 @@ def get_rgb_cost_mat(img):
 	#blur = cv2.blur(img,(5,5))
 	blur = cv2.medianBlur(img,5)
 
-	b,g,r = cv2.split(img)
+	b,g,r = cv2.split(blur)
 	'''print(img[0,0])
 	print(b[0,0],g[0,0],r[0,0])
 	plt.subplot(131),plt.imshow(r,'gray'),plt.title('r')
