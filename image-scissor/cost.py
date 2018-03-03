@@ -72,7 +72,7 @@ def get_dlink_mat(img):
 
 		dlink_mat.append(dlink_mat_row)
 
-	print("Max_D_link: ",Max_D_link)
+	#print("Max_D_link: ",Max_D_link)
 	'''for i in range(height-2):
 		for j in range(width-2):
 			dlink_mat[i][j] = link_cost(dlink_mat[i][j])

@@ -95,6 +95,7 @@ class ImageViewer(QScrollArea):
 		self.iScissorStarted = isStart
 		if isStart : 
 			self.costGraph = self.widget().start()
+			print('iScissor Ready')
 		return
 	def setiScissorDone(self):
 		print(len(self.min_path) )
@@ -179,16 +180,22 @@ class ImageViewer(QScrollArea):
 		return QPixmap.fromImage(image)
 
 	def getMaskedImage(self):
-		min_path = np.array(self.widget().getClosedCoutour())
-		mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
-		'''mp = min_path
+		self.min_path = np.array(self.widget().getClosedCoutour())
+		coutour_img = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
+		mp = self.min_path
 		for i in range(len(mp)-1):
-				cv2.line(mask,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),255,1)
-		im2, contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-		mask = np.zeros((self.qImageHieght,self.qImageWidth),np.uint8)
-		cv2.drawContours(mask, contours, -1, 255, cv2.FILLED)
-		'''
-		cv2.fillConvexPoly(mask,min_path,255)
+				cv2.line(coutour_img,(mp[i][0],mp[i][1]),(mp[i+1][0],mp[i+1][1]),255,1)
+
+		mask = np.zeros((self.qImageHieght+2,self.qImageWidth+2), np.uint8)
+ 
+		# Floodfill from point (0, 0)
+		cv2.floodFill(coutour_img, mask, (0,0), 255);
+		 
+		# Invert floodfilled image
+		mask = cv2.bitwise_not(coutour_img)
+		#cv2.imshow('mask',mask)
+		#cv2.waitKey()
+		#cv2.fillConvexPoly(mask,min_path,255)
 
 		#cv2.imshow('mask',mask)
 		#cv2.waitKey()
@@ -211,7 +218,7 @@ class ImageViewer(QScrollArea):
 	def getPathTreeGraph(self):
 		m = 3
 		graph = np.zeros((self.qImageHieght*m,self.qImageWidth*m,3),np.uint8)
-		cv2.circle(graph,(int(self.cur_seed[0]*m),int(self.cur_seed[1]*m)), 2, (0,0,255), -1)
+		cv2.circle(graph,(int(self.cur_seed[0]*m),int(self.cur_seed[1]*m)), 4, (255,255,255), -1)
 		for i in range(self.qImageHieght):
 			for j in range(self.qImageWidth):
 				mp = np.array(self.widget().get_min_path_coordinates(i,j))

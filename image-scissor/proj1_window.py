@@ -269,7 +269,7 @@ class MainWindow(QMainWindow):
 				statusTip="Display the orignal Image",
 				triggered=self.orignalImg)
 
-		self.imgWithContourAct = QAction("&Modified Image", self,
+		self.imgWithContourAct = QAction("&Contour Image", self,
 				statusTip="Display the Image with marked Contour",
 				triggered=self.imgWithContour)
 
