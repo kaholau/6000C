@@ -49,7 +49,7 @@ def compute_min_cost_path(x, y, node_mat):
         
         for i in range(0, len(ncoord)):
             
-            if (ncoord[i][0] >= node_mat_dim_x) or (ncoord[i][1] >= node_mat_dim_y):
+            if (ncoord[i][0] >= node_mat_dim_x - 2) or (ncoord[i][1] >= node_mat_dim_y - 2):
                 continue
             #print("index")
             #print(str(ncoord[i][0]))
