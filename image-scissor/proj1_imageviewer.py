@@ -77,7 +77,6 @@ class ImageViewer(QScrollArea):
 		if self.seedNum>0:
 			print('Creating Path Tree, please wait......')
 			img = self.getPathTreeGraph()
-			print('Path Tree Done')
 		return
 
 	def resize(self, factor):
@@ -219,14 +218,26 @@ class ImageViewer(QScrollArea):
 		m = 3
 		graph = np.zeros((self.qImageHieght*m,self.qImageWidth*m,3),np.uint8)
 		cv2.circle(graph,(int(self.cur_seed[0]*m),int(self.cur_seed[1]*m)), 4, (255,255,255), -1)
-		for i in range(self.qImageHieght):
-			for j in range(self.qImageWidth):
+		print(self.cur_seed)
+		'''start_h = self.cur_seed[0] -int(self.cur_seed[0]*0.2)
+		end_h = int((self.qImageHieght - self.cur_seed[0])*0.2)+self.cur_seed[0]
+		start_w = self.cur_seed[1] - int(self.cur_seed[1]*0.2)
+		end_w = int((self.qImageWidth - self.cur_seed[1])*0.2)+self.cur_seed[1]
+		print(start_h,end_h,start_w,end_w)
+
+		for i in range(start_h,end_h):
+			for j in range(start_w,end_w):
+		'''
+
+		for i in range(5,self.qImageHieght-5):
+			for j in range(5,self.qImageWidth-5):		
 				mp = np.array(self.widget().get_min_path_coordinates(i,j))
 				mp *= m
 				for k in range(int(mp.size/2)-1):
 					if (graph[mp[k+1,1],mp[k+1,0]].all() == 0):
 						cv2.line(graph,(mp[k,0],mp[k,1]),(mp[k+1,0],mp[k+1,1]),(255,0,0),1)
 
+		print('Path Tree Done')
 		plt.imshow(graph)
 		plt.suptitle('Path Tree')
 		plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
